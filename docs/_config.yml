@@ -1,0 +1,22 @@
+# GitHub Pages Configuration for Numina
+
+title: Numina
+description: AI-Powered Real-Time Closing Platform for CPAs and Finance Teams
+author: Numina Team
+email: hello@numina.ai
+
+# Build settings
+markdown: kramdown
+theme: jekyll-theme-minimal
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# GitHub Pages specific
+github:
+  repository_url: https://github.com/kredd2506/Numina-
+  is_project_page: true

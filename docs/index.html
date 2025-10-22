@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Numina - AI-Powered Real-Time Closing Platform for CPAs and Finance Teams">
+    <title>Numina | Real-Time Closing Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                        <path d="M16 8C12.134 8 9 11.134 9 15C9 16.885 9.737 18.592 10.943 19.857L16 25L21.057 19.857C22.263 18.592 23 16.885 23 15C23 11.134 19.866 8 16 8Z" fill="white"/>
+                        <circle cx="16" cy="15" r="3" fill="url(#gradient)"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#1e3a8a"/>
+                                <stop offset="100%" stop-color="#0d9488"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>Numina</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#tech-stack">Tech Stack</a>
+                <a href="#about">About</a>
+                <a href="https://github.com/kredd2506/Numina-" target="_blank" class="btn-github">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.137 18.163 20 14.418 20 10c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="badge">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0L10.472 5.528L16 8L10.472 10.472L8 16L5.528 10.472L0 8L5.528 5.528L8 0Z"/>
+                    </svg>
+                    AI Agent Demo Available
+                </div>
+                <h1 class="hero-title">
+                    AI-Powered Audits.<br>
+                    <span class="gradient-text">Effortless Accuracy.</span>
+                </h1>
+                <p class="hero-description">
+                    Revolutionary AI technology that transforms your financial data analysis,
+                    automatically flags invalid receipts, and streamlines reconciliation for
+                    finance teams and auditors.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">80%</div>
+                        <div class="stat-label">Time Reduction</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Accuracy Rate</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">AI Monitoring</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Intelligent Audit Automation</h2>
+                <p>Powered by advanced AI algorithms, Numina delivers unprecedented accuracy and efficiency</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <h3>Automatic Receipt Validation</h3>
+                    <p>AI-powered analysis instantly identifies suspicious receipts, duplicate entries, and potential fraud indicators.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon teal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                    </div>
+                    <h3>Duplicate Detection</h3>
+                    <p>Advanced pattern recognition eliminates redundant entries and ensures data integrity across all transactions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3>QuickBooks Integration</h3>
+                    <p>Seamless connectivity with QuickBooks for real-time data analysis and automated workflow integration.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h3>AI Rule Generation</h3>
+                    <p>Convert natural language instructions into machine-executable audit rules with advanced AI processing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <div class="section-header">
+                <h2>System Architecture</h2>
+                <p>Seamless integration between Gmail, AWS, n8n, and QuickBooks</p>
+            </div>
+            <div class="architecture-content">
+                <div class="architecture-diagram">
+                    <img src="../Architecture Diagram.png" alt="Numina System Architecture" loading="lazy">
+                </div>
+                <div class="architecture-description">
+                    <div class="arch-item">
+                        <div class="arch-number">01</div>
+                        <div class="arch-text">
+                            <h4>Ingestion Pipeline</h4>
+                            <p>Gmail triggers detect incoming financial documents. Attachments are classified and uploaded to S3, triggering Lambda-based OCR processing.</p>
+                        </div>
+                    </div>
+                    <div class="arch-item">
+                        <div class="arch-number">02</div>
+                        <div class="arch-text">
+                            <h4>AI Processing</h4>
+                            <p>AWS Bedrock (Claude 3 Haiku) and Textract extract structured data from images and PDFs with 95%+ confidence scoring.</p>
+                        </div>
+                    </div>
+                    <div class="arch-item">
+                        <div class="arch-number">03</div>
+                        <div class="arch-text">
+                            <h4>Validation & Reconciliation</h4>
+                            <p>n8n workflow orchestrates AI agent (Google Gemini) to classify Bills vs Invoices and validate against QuickBooks data.</p>
+                        </div>
+                    </div>
+                    <div class="arch-item">
+                        <div class="arch-number">04</div>
+                        <div class="arch-text">
+                            <h4>Real-Time Sync</h4>
+                            <p>Validated transactions are atomically pushed to QuickBooks via HTTP API with duplicate detection and integrity guarantees.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech-stack" class="tech-stack">
+        <div class="container">
+            <div class="section-header">
+                <h2>Technology Stack</h2>
+                <p>Built with modern, scalable technologies</p>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h3>Frontend</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">React 18.3</span>
+                        <span class="tech-tag">TypeScript 5.5</span>
+                        <span class="tech-tag">Vite 5.4</span>
+                        <span class="tech-tag">TailwindCSS 3.4</span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Backend</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Node.js + Express</span>
+                        <span class="tech-tag">Google Gemini AI</span>
+                        <span class="tech-tag">Python + AWS Lambda</span>
+                        <span class="tech-tag">n8n Automation</span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Cloud & AI</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">AWS Bedrock</span>
+                        <span class="tech-tag">AWS Textract</span>
+                        <span class="tech-tag">AWS S3</span>
+                        <span class="tech-tag">Claude 3 Haiku</span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Integration</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">QuickBooks API</span>
+                        <span class="tech-tag">Gmail API</span>
+                        <span class="tech-tag">OAuth2</span>
+                        <span class="tech-tag">Webhooks</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-icon">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="8" y="12" width="48" height="40" rx="4"/>
+                        <path d="M32 28V40M26 34H38"/>
+                    </svg>
+                </div>
+                <h2>Our Vision</h2>
+                <p class="about-description">
+                    We're redefining how audits are done — with intelligence, transparency, and trust.
+                    Our mission is to empower finance professionals with AI-driven insights that eliminate
+                    manual errors, reduce audit time by 80%, and ensure absolute accuracy in financial reporting.
+                </p>
+                <div class="about-story">
+                    <h3>The Story</h3>
+                    <p>
+                        After speaking with <strong>Edward</strong>, a Certified Public Accountant, we discovered that the core
+                        problems of CPAs and CAs persist even in the age of automation. Small-business clients without
+                        dedicated accounting teams simply shift unverified data onto their accountants, forcing them to
+                        be the end-of-chain verifiers.
+                    </p>
+                    <p>
+                        Edward challenged us to build a solution that fundamentally improves the closing process.
+                        That mandate became <strong>Numina</strong> — the AI agent designed to solve the "crunch time" problem
+                        for accounting professionals globally.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Audit Process?</h2>
+                <p>Join CPAs and finance teams already using Numina for real-time closing</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/kredd2506/Numina-" class="btn-primary" target="_blank">
+                        View on GitHub
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 12L10 8L6 4"/>
+                        </svg>
+                    </a>
+                    <a href="mailto:hello@numina.ai" class="btn-secondary">
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="url(#gradient2)"/>
+                            <path d="M16 8C12.134 8 9 11.134 9 15C9 16.885 9.737 18.592 10.943 19.857L16 25L21.057 19.857C22.263 18.592 23 16.885 23 15C23 11.134 19.866 8 16 8Z" fill="white"/>
+                            <circle cx="16" cy="15" r="3" fill="url(#gradient2)"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="32" y2="32">
+                                    <stop offset="0%" stop-color="#1e3a8a"/>
+                                    <stop offset="100%" stop-color="#0d9488"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Numina</span>
+                    </div>
+                    <p>Real-Time Closing Platform</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#architecture">Architecture</a>
+                        <a href="#tech-stack">Tech Stack</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <a href="https://github.com/kredd2506/Numina-" target="_blank">Documentation</a>
+                        <a href="https://github.com/kredd2506/Numina-" target="_blank">GitHub</a>
+                        <a href="#about">About</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Contact</h4>
+                        <a href="mailto:hello@numina.ai">hello@numina.ai</a>
+                        <a href="https://twitter.com/numina" target="_blank">Twitter</a>
+                        <a href="https://linkedin.com/company/numina" target="_blank">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Numina. All rights reserved.</p>
+                <p>Built with ❤️ for accountants, by engineers who care about solving real problems.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
