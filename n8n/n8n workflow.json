@@ -1,0 +1,792 @@
+{
+  "name": "My workflow - AWS integration",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Take the mail -: \n{{ $json.headers.subject || $json.gmailSubject || $json.subject || ''}}\nBody : \n{{ $json.html ||  $json.gmailHtml || ''}}\nBody text\n{{ $json.text || $json.gmailText || $json.body.image_ocr}}\n",
+        "options": {
+          "systemMessage": "=Accounting AI Agent - System Prompt\n\nYou are an Accounting AI Agent. Your role is to process incoming company emails from Gmail and record them as Bills or Invoices in the accounting system.\n\nWorkflow:\n\n1. Use the fetched mail : \n\n2. Extract Information\n   - Determine whether the email is a Bill or an Invoice based on the Body text.\n   - Parse the email to extract line items (description, amount), subtotal, tax, and total.\n   - If the email does not fit either category, return: \"No action needed\".\n\n3. Check for Duplicates\n   - Always use GetBills and GetInvoice tools.\n   - Match on vendor, amount, and date for the bill and \n     customer, amount, invoice number for the invoice\n   - If a duplicate exists, return: \"No action needed\".\n\n4. Process a Bill\n   - If a Bill, call CreateBill with:\n     * vendor: Vendor name\n     * date: Bill date\n     * lineItems: List of items (description, amount)\n     * subtotal: Sum of line items\n     * tax: Tax amount\n     * total: Subtotal + tax\n     * Use the getItems tool to get the items then follow these 2 sub points -:\n      - Item exists is the retieved items + has  expense account → use ItemBasedExpenseLineDetail.\n\n      - Item missing OR has no expense account → use AccountBasedExpenseLineDetail and directly reference an expense account.\n\n     * category: Expense category (e.g., Job Materials, Insurance)\n     * paymentMethod: Default to \"Unspecified\" if not provided\n\n5. Process an Invoice\n   - If an Invoice:\n     * Determine the total invoice amount\n     * Use customer ID extracted based on the customer name from the tool getCustomers.\n     * Use line item IDs: extracted based on the customer name from the tool getItems.\n     * Fetch details with GetCustomer (for customer) and GetItems (for items)\n     * Populate values in SalesItemLineDetail using the IDs\n\n6. Final Step\n   - If the output is No action needed create the structured output body keeping the fields in bill and invoice empty\n   - If Bill →  create the structured output body according to the bill format.\n   - If Invoice → create the structured output body according to the invoice format and keep the fields in bill empty.\n   - If its a bill the bill field is mandatory to be filled and if it is an invoice the invoice field is mandatory.\n\nReturn a json which can be structured in the format given in the structured format parser  : \n{\n  \"bill\": {\n    \"DueDate\": \"2025-07-15\",\n    \"VendorRef\": {\n      \"value\": \"56\",\n      \"name\": \"Bob's Burger Joint\"\n    },\n    \"APAccountRef\": {\n      \"value\": \"33\",\n      \"name\": \"Accounts Payable (A/P)\"\n    },\n    \"TxnDate\": \"2025-07-15\",\n    \"CurrencyRef\": {\n      \"value\": \"USD\"\n    },\n    \"Line\": [\n      {\n        \"Description\": \"Consulting Services - no expense account set\",\n        \"Amount\": 200,\n        \"DetailType\": \"AccountBasedExpenseLineDetail\",\n        \"AccountBasedExpenseLineDetail\": {\n          \"BillableStatus\": \"NotBillable\",\n          \"AccountRef\": {\n            \"value\": \"8\",\n            \"name\": \"Uncategorized Expense\"\n          },\n          \"TaxCodeRef\": {\n            \"value\": \"NON\"\n          }\n        }\n      },\n      {\n        \"Description\": \"Office Supplies (Item with expense account)\",\n        \"Amount\": 75,\n        \"DetailType\": \"ItemBasedExpenseLineDetail\",\n        \"ItemBasedExpenseLineDetail\": {\n          \"BillableStatus\": \"NotBillable\",\n          \"ItemRef\": {\n            \"value\": \"12\",\n            \"name\": \"Stationery Supplies\"\n          },\n          \"UnitPrice\": 75,\n          \"Qty\": 1,\n          \"TaxCodeRef\": {\n            \"value\": \"NON\"\n          }\n        }\n      }\n    ]\n  },\n  \"invoice\": {\n    \"DocNumber\": \"2046\",\n    \"TxnDate\": \"2025-08-26\",\n    \"CustomerRef\": {\n      \"value\": \"3\"\n    },\n    \"Line\": [\n      {\n        \"Amount\": 500,\n        \"DetailType\": \"SalesItemLineDetail\",\n        \"SalesItemLineDetail\": {\n          \"ItemRef\": {\n            \"value\": \"4\",\n            \"name\": \"Software Subscription\"\n          },\n          \"Qty\": 1,\n          \"UnitPrice\": 500\n        }\n      },\n      {\n        \"Amount\": 275,\n        \"DetailType\": \"SalesItemLineDetail\",\n        \"SalesItemLineDetail\": {\n          \"ItemRef\": {\n            \"value\": \"11\",\n            \"name\": \"Consulting Services\"\n          },\n          \"Qty\": 1,\n          \"UnitPrice\": 275\n        }\n      },\n      {\n        \"Amount\": 425,\n        \"DetailType\": \"SalesItemLineDetail\",\n        \"SalesItemLineDetail\": {\n          \"ItemRef\": {\n            \"value\": \"5\",\n            \"name\": \"Training Workshop\"\n          },\n          \"Qty\": 1,\n          \"UnitPrice\": 425\n        }\n      }\n    ]\n  }\n}\n,\n  \"invoice\" : {\n  \"DocNumber\": \"2045\",\n  \"TxnDate\": \"2025-08-26\",\n  \"CustomerRef\": {\n    \"value\": \"3\"\n  },\n  \"Line\": [\n    {\n      \"Amount\": 500,\n      \"DetailType\": \"SalesItemLineDetail\",\n      \"SalesItemLineDetail\": {\n        \"ItemRef\": {\n          \"value\": \"4\"\n        },\n        \"Qty\": 1,\n        \"UnitPrice\": 500\n      }\n    },\n    {\n      \"Amount\": 275,\n      \"DetailType\": \"SalesItemLineDetail\",\n      \"SalesItemLineDetail\": {\n        \"ItemRef\": {\n          \"value\": \"11\"\n        },\n        \"Qty\": 1,\n        \"UnitPrice\": 275\n      }\n    },\n    {\n      \"Amount\": 425,\n      \"DetailType\": \"SalesItemLineDetail\",\n      \"SalesItemLineDetail\": {\n        \"ItemRef\": {\n          \"value\": \"5\"\n        },\n        \"Qty\": 1,\n        \"UnitPrice\": 425\n      }\n    },\n    {\n      \"Amount\": 300,\n      \"DetailType\": \"SalesItemLineDetail\",\n      \"SalesItemLineDetail\": {\n        \"ItemRef\": {\n          \"value\": \"1\"\n        },\n        \"Qty\": 1,\n        \"UnitPrice\": 300\n      }\n    }\n  ]\n}}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        336
+      ],
+      "id": "18c38c75-3b09-4d8b-879c-1ac7f2aca2ec",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "notesInFlow": true,
+      "retryOnFail": false,
+      "maxTries": 5,
+      "notes": "You are an AI Agent that processes Gmail messages into QuickBooks Online.\n\nAvailable tools:\n- Get many messages in Gmail\n- Create a bill in QuickBooks Online\n- Create a payment in QuickBooks Online\n\nRules:\n1. Always use a tool. Never respond with plain text or empty output.\n2. If asked to \"check latest mail\", call `Get many messages in Gmail` first.\n3. From the Gmail result, decide:\n   - If it’s a vendor invoice/receipt, call `Create a bill in QuickBooks Online`.\n   - If it’s a customer payment, call `Create a payment in QuickBooks Online`.\n4. If some required fields are missing (e.g., line items), create fallback values:\n   - Use a generic line item \"General Expense\".\n   - Include subtotal and tax if available.\n5. Final output must always be a tool call with valid JSON input.\n"
+    },
+    {
+      "parameters": {
+        "resource": "bill",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.quickbooksTool",
+      "typeVersion": 1,
+      "position": [
+        432,
+        560
+      ],
+      "id": "e37d9d62-1f8b-47b0-b159-a330297971c2",
+      "name": "GetBills",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        560
+      ],
+      "id": "54619b8c-d6ab-46f9-bf74-69049820ee7c",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xI6ggGgG580MPFC5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "invoice",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.quickbooksTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        560
+      ],
+      "id": "eeea058d-f75d-45f9-99a3-e34760f1e572",
+      "name": "GetInvoice",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\nconst cleanedItems = items.map((item) => {\n  let cleanedOutput = item.output.replace(/```json|```/g, \"\");\n  let parsedOutput = JSON.parse(cleanedOutput);\n  let isBill = Object.keys(parsedOutput.bill).length !== 0 ? \"1\" : \"0\";\n  let isInvoice = Object.keys(parsedOutput.invoice).length !== 0 ? \"1\" : \"0\";\n  return { isBill, isInvoice };\n});\nreturn cleanedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        336
+      ],
+      "id": "e371a098-4cc3-4ede-8478-0b5fc4cd387c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isBill }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "98e0320f-77c7-4db6-a8b9-828709417278"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c6ce8d66-6bd1-4500-843c-cc1c37088735",
+                    "leftValue": "={{ $json.isInvoice }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1424,
+        336
+      ],
+      "id": "4085f9c3-c6a8-4d77-a86a-7e15d5683bb7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.quickbooksTool",
+      "typeVersion": 1,
+      "position": [
+        736,
+        560
+      ],
+      "id": "aba5bb6f-bcd4-4c1b-9b82-636052b57841",
+      "name": "GetCustomers1",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "item",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.quickbooksTool",
+      "typeVersion": 1,
+      "position": [
+        864,
+        560
+      ],
+      "id": "2983b9ff-8dfb-4787-9853-aca798c7624e",
+      "name": "GetItems",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "vendor",
+        "operation": "getAll",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.quickbooksTool",
+      "typeVersion": 1,
+      "position": [
+        992,
+        560
+      ],
+      "id": "8245b57b-b6b5-42d8-8bac-12508115fda6",
+      "name": "GetVendors1",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sandbox-quickbooks.api.intuit.com/v3/company/9341455041666215/bill",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "quickBooksOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "minorversion",
+              "value": "69"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwieC5vcmciOiJIMCJ9..52UgvixjmkUXz7QSmS4aKw.k7dgj3W5HXL_OU5bM0F-0Gm2kSZccbIA2-mfoP08RDo0L-TyJoNPGzVmU--BSYHRx_TpCeRZQaMDJTY8aHkyfHEQ74t1QIjZsSh-awZVgjqbzj1qXoFQhkDM6Y0WYFVavU0WSmAeXKg9tfdavZG1GZn9H7WhTk-fskc173PIbD3DmsXuVcpsvS_YE9AHwddfc9a9f5Mvkwb2OzdNr26u9X-FKp1DUS4mivNfoaiVfyTbdyRNisoefNAUAC_LxwA-tmdxF8b0rtZANe_MfLReMVf1Z-F1mjP77iAKOIOh13hR3AVRLD_VoNf2Wtefjyt-uTje7t8YVYYH-rYRr0KOpdYqBD8iYmJ-HF-4j6Lv_RwXvsQs3XKJgX7ntnLQ8H-n5WaopDNfDQuBNfvGUKKr1ygRM7A5ZwGR4Qy4gKWHZjGUMnEahl92Bp82Y6d4XKVL-vf2u8B7fgaa_1GnvH23MJkk8ljBAJw9gAKoSGMSLe4.JmsnxN5qTRhks-iboEJVSQ"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('AI Agent').item.json.output.replace(/```json|```/g, \"\").parseJson().bill.toJsonString() }}\n\n\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1648,
+        240
+      ],
+      "id": "a51b91aa-ea1a-4e69-b207-b40bc83a3d23",
+      "name": "Create Bill",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sandbox-quickbooks.api.intuit.com/v3/company/9341455041666215/invoice",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "quickBooksOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "minorversion",
+              "value": "69"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwieC5vcmciOiJIMCJ9..KpDykyqWWON89VVHClNEMw.qFlXrVCu7ZHfxhojDxHhzkIgsLMgT6G05OMWq313PoK4L1c28b8JF_2B7Elb--Vn4n8WyCsjQF4wjWkjnXckU6Up1oB6hbSPCGNxClqOIezfbEgXfI5T83agIzw-z5Rrrq6Yr3tBcTy-PX5QgCwNBPKB71YGk1nDfBtbbgJySj0q5eGKJmHsPk2XbWdWyemYkQVimdOZgNDUPaMG88YR8vmUKrfU43sRegGr38aXIdecmKbCU4rogBs_iLEKkg8OXg--V3nRTXnsaw9JAykPkmL8HV3e3Gti_38o28xPLEzpT4328AG9wmiv3830PUxpmex5-cdEiyijP1i8aVyG96xypFsKiD6ftXFztkrHfzIZAL4Tg5ZfEwLvMx9foJOwSNV2HSHb5PWgXSt2SvMf0bS5GJ8vxdjEgqwByNQLgVrh1lSDaT_PHfFBsfyo9TLkrpZXpsOJFCUzXz9ZtZfFP7VFnzU4PsZgFt_wl1Sbzy4.CzsPa1VClQNjFv6iXtevfg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('AI Agent').item.json.output.replace(/```json|```/g, \"\").parseJson().invoice.toJsonString() }}\n\n\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1648,
+        432
+      ],
+      "id": "44a54cea-90ea-4419-bcfb-5c1c64117092",
+      "name": "Create Invoice",
+      "credentials": {
+        "quickBooksOAuth2Api": {
+          "id": "XNPyo4L3vzBQJzlJ",
+          "name": "QuickBooks Online account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -848,
+        320
+      ],
+      "id": "e1873856-6751-4b93-8dd9-0736ecd38491",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Ufp2xbS3CPn5Yz8p",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Detect qualifying attachments & split into:\n//  - one \"control\" item: kind=\"control\", hasOcrAttachment: boolean\n//  - N \"attachment\" items: kind=\"attachment\", with binary.file ready for S3\n\nfunction guessMimeFromName(name='') {\n  const n = name.toLowerCase();\n  if (n.endsWith('.png')) return 'image/png';\n  if (n.endsWith('.jpg') || n.endsWith('.jpeg')) return 'image/jpeg';\n  if (n.endsWith('.pdf')) return 'application/pdf';\n  return 'application/octet-stream';\n}\nfunction cleanSubject(item) {\n  // Prefer parsed subject; fallback to header with \"Subject: \" stripped\n  const parsed = item.json.subject;\n  if (parsed) return parsed;\n  const hdr = item.json.headers?.subject || '';\n  return hdr.replace(/^Subject:\\s*/i, '');\n}\n\nconst item = items[0];\nconst bin = item.binary || {};\nconst attachments = Object.entries(bin).filter(([k, v]) => {\n  const mt = (v.mimeType || '').toLowerCase();\n  const fn = (v.fileName || '').toLowerCase();\n  return mt.startsWith('image/') || fn.endsWith('.pdf');\n});\n\nconst subject = cleanSubject(item);\nconst out = [];\n\n// CONTROL item (only one)\nout.push({\n  json: {\n    kind: 'control',\n    hasOcrAttachment: attachments.length > 0,\n    subject,\n    html: item.json.html,\n    text: item.json.text,\n    messageId: item.json.id,\n    headers: item.json.headers,   // keep original header block if you need it\n  },\n  binary: item.binary,            // optional: keep raw binaries for reference\n});\n\n// ATTACHMENT items (one per qualifying attachment)\nfor (const [name, data] of attachments) {\n  const fileName = data.fileName || name;\n  const mimeType = data.mimeType || guessMimeFromName(fileName);\n  const normalized = { ...data, mimeType, fileName };\n\n  out.push({\n    json: {\n      kind: 'attachment',\n      hasOcrAttachment: true,\n      fileName,\n      messageId: item.json.id,\n      subject,\n      html: item.json.html,\n      text: item.json.text,\n      attachmentProperty: name, // original property name (attachment_0, etc.)\n    },\n    binary: { file: normalized }, // S3 node will read from binary.file\n  });\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        320
+      ],
+      "id": "d0bc5473-d2c1-4936-b961-02afb8b352ed",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3365289d-7558-426f-a994-8c7fde26f10f",
+              "leftValue": "={{ $json.hasOcrAttachment.toString() }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        320
+      ],
+      "id": "2e2f8726-ef28-4953-a820-ef214e963357",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nfor (const item of items) {\n  const b = item.binary?.file;\n  if (b) {\n    const name = (b.fileName || '').toLowerCase();\n    if (!b.mimeType) {\n      b.mimeType = name.endsWith('.png') ? 'image/png'\n               : name.endsWith('.jpg') || name.endsWith('.jpeg') ? 'image/jpeg'\n               : name.endsWith('.pdf') ? 'application/pdf'\n               : 'application/octet-stream';\n    }\n  }\n  out.push(item);\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        96
+      ],
+      "id": "88dd3ed1-b264-45e2-9e72-14d20cb434de",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "sage-books-ocr",
+        "fileName": "=incoming/{{$json.messageId}}_{{$json.fileName}}",
+        "binaryPropertyName": "file",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        128,
+        96
+      ],
+      "id": "4983c6ce-de36-41ff-b8cb-1da1c0e7697c",
+      "name": "Upload a file",
+      "retryOnFail": true,
+      "credentials": {
+        "aws": {
+          "id": "hOpTAOa1C4VYeCPp",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/ocr/result",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        96
+      ],
+      "id": "3ba239c1-a54e-4472-9f38-3bc1ac6f9aee",
+      "name": "Webhook",
+      "webhookId": "9d14be79-89ae-4728-9ee4-57342172feae",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TBdrM6zF6uMypSMh",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -848,
+        528
+      ],
+      "id": "f12a64b2-9985-4e78-92dd-3ca8197b3b84",
+      "name": "Gmail Trigger2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Hx4BjcwV4NvkCUMe",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "014b97a2-ac18-42dc-817c-11fcffd27aa8",
+              "leftValue": "={{ $json.kind === 'control' && $json.hasOcrAttachment === false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        336
+      ],
+      "id": "807ea88d-d9ba-4309-a009-aea5d197fa5c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fdaa3c24-f39a-402e-baea-91d44bd674dd",
+              "leftValue": "={{ $json.kind === 'attachment' && !!$binary.file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        96
+      ],
+      "id": "d9ba6189-713b-4e3c-a962-6e1c7d246c33",
+      "name": "Filter1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetBills": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetInvoice": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create Bill",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetCustomers1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetItems": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetVendors1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        []
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5e9c0ddb-06f2-4157-a99c-47343f1cc090",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2e4b33c8b2b6af07df84939414817d54db0cca00caf9dd3f06987e963f919104"
+  },
+  "id": "hSqH7a2uJZpvwAsz",
+  "tags": []
+}
